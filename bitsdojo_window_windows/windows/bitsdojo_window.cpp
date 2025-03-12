@@ -2,10 +2,12 @@
 #include "./bitsdojo_window_common.h"
 #include "./include/bitsdojo_window_windows/bitsdojo_window_plugin.h"
 #include "./window_util.h"
-#include <cstdlib> // For wcstol
 #include <dwmapi.h>
+#include <malloc.h>
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <strsafe.h>
 #include <windows.h>
 #include <windowsx.h>
 #include <winscard.h>
@@ -338,6 +340,40 @@ struct MonitorEnumData {
   bool found;
 };
 
+#define DBGPRINT(kwszDebugFormatString, ...)                                   \
+  _DBGPRINT(__FUNCTIONW__, __LINE__, kwszDebugFormatString, __VA_ARGS__)
+
+VOID _DBGPRINT(LPCWSTR kwszFunction, INT iLineNumber,
+               LPCWSTR kwszDebugFormatString, ...) {
+  INT cbFormatString = 0;
+  va_list args;
+  PWCHAR wszDebugString = NULL;
+  size_t st_Offset = 0;
+
+  va_start(args, kwszDebugFormatString);
+
+  cbFormatString =
+      _scwprintf(L"[%s:%d] ", kwszFunction, iLineNumber) * sizeof(WCHAR);
+  cbFormatString +=
+      _vscwprintf(kwszDebugFormatString, args) * sizeof(WCHAR) + 2;
+
+  /* Depending on the size of the format string, allocate space on the stack or
+   * the heap. */
+  wszDebugString = (PWCHAR)_malloca(cbFormatString);
+
+  /* Populate the buffer with the contents of the format string. */
+  StringCbPrintfW(wszDebugString, cbFormatString, L"[%s:%d] ", kwszFunction,
+                  iLineNumber);
+  StringCbLengthW(wszDebugString, cbFormatString, &st_Offset);
+  StringCbVPrintfW(&wszDebugString[st_Offset / sizeof(WCHAR)],
+                   cbFormatString - st_Offset, kwszDebugFormatString, args);
+
+  OutputDebugStringW(wszDebugString);
+
+  _freea(wszDebugString);
+  va_end(args);
+}
+
 bool centerOnMonitorContainingMouse(HWND window, int width, int height) {
   MONITORINFO monitorInfo = {};
   monitorInfo.cbSize = DWORD(sizeof(MONITORINFO));
@@ -345,14 +381,13 @@ bool centerOnMonitorContainingMouse(HWND window, int width, int height) {
   wchar_t envstr[64];
   DWORD envlen = GetEnvironmentVariableW(L"TL_TARGET_MONITOR", envstr, 64);
   MonitorEnumData data = {&monitorInfo, 0, 0, false};
+  // DBGPRINT(L"CHECKING ENV %ls", L"TL_TARGET_MONITOR");
 
   if (envlen > 0) {
     wchar_t *endPtr; // Pointer to the first non-converted character
     long int monitorIndex =
-        std::wcstol(envstr, &endPtr, 10); // 10 is the base (decimal)
+        wcstol(envstr, &endPtr, 10); // 10 is the base (decimal)
 
-    MONITORINFO monitorInfo = {};
-    monitorInfo.cbSize = DWORD(sizeof(MONITORINFO));
     data.targetIndex = monitorIndex;
 
     EnumDisplayMonitors(
