@@ -23,8 +23,7 @@ class CachedWindowInfo {
 
 Rect getScreenRectForWindow(int handle) {
   Pointer<Int32> gtkRect = malloc.allocate(sizeOf<Int32>() * 4);
-  native.getScreenRect(handle, gtkRect.elementAt(0), gtkRect.elementAt(1),
-      gtkRect.elementAt(2), gtkRect.elementAt(3));
+  native.getScreenRect(handle, gtkRect, gtkRect + 1, gtkRect + 2, gtkRect + 3);
   Rect result = Rect.fromLTWH(gtkRect[0].toDouble(), gtkRect[1].toDouble(),
       gtkRect[2].toDouble(), gtkRect[3].toDouble());
   malloc.free(gtkRect);
@@ -57,7 +56,6 @@ class GtkWindow extends DesktopWindow {
 
   @override
   bool get isVisible {
-    //TODO: implement
     return true;
   }
 
@@ -70,8 +68,8 @@ class GtkWindow extends DesktopWindow {
     }
 
     Pointer<Int32> gtkRect = malloc.allocate(sizeOf<Int32>() * 4);
-    native.getPosition(handle!, gtkRect.elementAt(0), gtkRect.elementAt(1));
-    native.getSize(handle!, gtkRect.elementAt(2), gtkRect.elementAt(3));
+    native.getPosition(handle!, gtkRect, gtkRect + 1);
+    native.getSize(handle!, gtkRect + 2, gtkRect + 3);
     Rect result = Rect.fromLTWH(gtkRect[0].toDouble(), gtkRect[1].toDouble(),
         gtkRect[2].toDouble(), gtkRect[3].toDouble());
 
@@ -87,6 +85,15 @@ class GtkWindow extends DesktopWindow {
         newRect.width.toInt(), newRect.height.toInt());
   }
 
+  Rect get screenRect {
+    return Rect.fromLTWH(0, 0, 69, 420);
+  }
+
+  void positionWindow(Function(Rect screen) fn) {
+    final screenRect = getScreenRectForWindow(handle!);
+    fn(screenRect);
+  }
+
   @override
   Size get size {
     if (!isValidHandle(handle, "get size")) return Size.zero;
@@ -96,8 +103,7 @@ class GtkWindow extends DesktopWindow {
     }
 
     Pointer<Int32> nativeResult = malloc.allocate(sizeOf<Int32>() * 2);
-    native.getSize(
-        handle!, nativeResult.elementAt(0), nativeResult.elementAt(1));
+    native.getSize(handle!, nativeResult, nativeResult + 1);
     Size result = Size(nativeResult[0].toDouble(), nativeResult[1].toDouble());
     malloc.free(nativeResult);
     final gotSize = getLogicalSize(result);
@@ -126,7 +132,7 @@ class GtkWindow extends DesktopWindow {
   double get scaleFactor {
     if (!isValidHandle(handle, "get scaleFactor")) return 1;
     Pointer<Int32> scaleFactorPtr = malloc.allocate(sizeOf<Int32>());
-    native.getScaleFactor(handle!, scaleFactorPtr.elementAt(0));
+    native.getScaleFactor(handle!, scaleFactorPtr);
     double result = scaleFactorPtr[0].toDouble();
     malloc.free(scaleFactorPtr);
     return result;
@@ -180,7 +186,7 @@ class GtkWindow extends DesktopWindow {
 
     _minSize = newSize;
     if (newSize == null) {
-      //TODO - add handling for setting minSize to null
+      // NYI: add handling for setting minSize to null
       return;
     }
     native.setMinSize(
@@ -193,7 +199,7 @@ class GtkWindow extends DesktopWindow {
 
     _maxSize = newSize;
     if (newSize == null) {
-      //TODO - add handling for setting maxSize to null
+      //NYI - add handling for setting maxSize to null
       return;
     }
     native.setMaxSize(

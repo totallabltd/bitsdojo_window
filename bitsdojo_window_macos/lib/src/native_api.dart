@@ -100,6 +100,12 @@ typedef DSetRectForWindow = int Function(int window, Pointer<BDWRect> rect);
 final DSetRectForWindow setRectForWindowNative =
     _publicAPI.ref.setRectForWindow.asFunction();
 
+// getRectForScreen
+typedef Int8 TGetRectForScreen(IntPtr window, Pointer<BDWRect> rect);
+typedef DGetRectForScreen = int Function(int window, Pointer<BDWRect> rect);
+final DGetRectForWindow getRectForScreenNative =
+    _publicAPI.ref.getRectForScreen.asFunction();
+
 // getRectForWindow
 typedef Int8 TGetRectForWindow(IntPtr window, Pointer<BDWRect> rect);
 typedef DGetRectForWindow = int Function(int window, Pointer<BDWRect> rect);
@@ -178,6 +184,7 @@ class BDWPublicAPI extends Struct {
       getScreenInfoForWindow;
   external Pointer<NativeFunction<TSetPositionForWindow>> setPositionForWindow;
   external Pointer<NativeFunction<TSetRectForWindow>> setRectForWindow;
+  external Pointer<NativeFunction<TGetRectForScreen>> getRectForScreen;
   external Pointer<NativeFunction<TGetRectForWindow>> getRectForWindow;
   external Pointer<NativeFunction<TIsWindowMaximized>> isWindowVisible;
   external Pointer<NativeFunction<TIsWindowMaximized>> isWindowMaximized;

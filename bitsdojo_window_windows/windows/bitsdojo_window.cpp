@@ -381,7 +381,7 @@ bool centerOnMonitorContainingMouse(HWND window, int width, int height) {
   wchar_t envstr[64];
   DWORD envlen = GetEnvironmentVariableW(L"TL_TARGET_MONITOR", envstr, 64);
   MonitorEnumData data = {&monitorInfo, 0, 0, false};
-  // DBGPRINT(L"CHECKING ENV %ls", L"TL_TARGET_MONITOR");
+  DBGPRINT(L"TL_TARGET_MONITOR: %ls", envstr);
 
   if (envlen > 0) {
     wchar_t *endPtr; // Pointer to the first non-converted character

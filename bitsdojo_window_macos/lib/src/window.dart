@@ -25,6 +25,15 @@ class MacOSWindow extends DesktopWindow {
     _setTitleOnNextShow = false;
   }
 
+  void positionWindow(Function(Rect screen) fn) {
+    final screenInfo = getScreenInfoForWindow(handle!);
+    if (screenInfo.workingRect == null) {
+      print("Can't set alignment - don't have a workingRect");
+      return;
+    }
+    fn(screenInfo.workingRect!);
+  }
+
   Size get size {
     final winRect = this.rect;
     return Size(winRect.right - winRect.left, winRect.bottom - winRect.top);
@@ -36,7 +45,7 @@ class MacOSWindow extends DesktopWindow {
   }
 
   double get scaleFactor {
-    //TODO: implement
+    //NYI: implement
     return 1;
   }
 
@@ -89,7 +98,7 @@ class MacOSWindow extends DesktopWindow {
     if (!isValidHandle(handle, "set minSize")) return;
     _minSize = newSize;
     if (newSize == null) {
-      //TODO - add handling for setting minSize to null
+      //NYI - add handling for setting minSize to null
       return;
     }
     setMinSize(handle!, _minSize!.width.toInt(), _minSize!.height.toInt());
@@ -99,7 +108,7 @@ class MacOSWindow extends DesktopWindow {
     if (!isValidHandle(handle, "set maxSize")) return;
     _maxSize = newSize;
     if (newSize == null) {
-      //TODO - add handling for setting maxSize to null
+      //NYI - add handling for setting maxSize to null
       return;
     }
     setMaxSize(handle!, _maxSize!.width.toInt(), _maxSize!.height.toInt());

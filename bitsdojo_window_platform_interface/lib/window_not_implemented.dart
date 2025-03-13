@@ -6,6 +6,10 @@ class NotImplementedWindow extends DesktopWindow {
     throw UnimplementedError('handle getter has not been implemented');
   }
 
+  void positionWindow(Function(Rect screen) fn) {
+    throw UnimplementedError('positionWindow has not been implemented');
+  }
+
   set size(Size newSize) {
     throw UnimplementedError('size setter has not been implemented');
   }

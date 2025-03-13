@@ -22,6 +22,8 @@ abstract class DesktopWindow {
 
   set title(String newTitle);
 
+  void positionWindow(Function(Rect screen) fn);
+
   @Deprecated("use isVisible instead")
   bool get visible;
   bool get isVisible;
