@@ -1,10 +1,9 @@
-name: bitsdojo_window_macos
-description: macOS implementation of the bitsdojo_window plugin.
+name: bitsdojo_window_linux
+description: Linux implementation of the bitsdojo_window plugin.
 version: 0.2.0
 homepage: https://www.bitsdojo.com
 repository: https://github.com/bitsdojo/bitsdojo_window
 publish_to: none
-
 environment:
   sdk: ">=2.17.0 <4.0.0"
   flutter: ">=1.20.0"
@@ -13,11 +12,10 @@ dependencies:
   flutter:
     sdk: flutter
   bitsdojo_window_platform_interface:
-    # git:
-    #   url: https://github.com/totallabltd/bitsdojo_window.git
-    #   ref: master
-    #   path: bitsdojo_window_platform_interface
-    path: ../bitsdojo_window_platform_interface
+    git:
+      url: https://github.com/totallabltd/bitsdojo_window.git
+      ref: master
+      path: bitsdojo_window_platform_interface
   ffi: ^2.0.0
 
 dev_dependencies:
@@ -27,5 +25,5 @@ dev_dependencies:
 flutter:
   plugin:
     platforms:
-      macos:
+      linux:
         pluginClass: BitsdojoWindowPlugin

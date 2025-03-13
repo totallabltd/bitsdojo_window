@@ -1,16 +1,8 @@
-[![Pub Version](https://img.shields.io/pub/v/bitsdojo_window)](https://pub.dev/packages/bitsdojo_window)
-[![Pub Popularity](https://img.shields.io/pub/popularity/bitsdojo_window)](https://pub.dev/packages/bitsdojo_window)
-[![Pub Points](https://img.shields.io/pub/points/bitsdojo_window)](https://pub.dev/packages/bitsdojo_window)
-
-[![GitHub Stars](https://img.shields.io/github/stars/bitsdojo/bitsdojo_window)](https://github.com/bitsdojo/bitsdojo_window/stargazers)
-[![Build Test](https://github.com/bitsdojo/bitsdojo_window/actions/workflows/build_test.yaml/badge.svg)](https://github.com/bitsdojo/bitsdojo_window/actions/workflows/build_test.yaml)
-[![GitHub License](https://img.shields.io/github/license/bitsdojo/bitsdojo_window)](https://github.com/bitsdojo/bitsdojo_window/blob/main/LICENSE)
-
 # bitsdojo_window
 
-A [Flutter package](https://pub.dev/packages/bitsdojo_window) that makes it easy to customize and work with your Flutter desktop app window on **Windows**, **macOS** and **Linux**.
+A [Flutter package](https://pub.dev/packages/bitsdojo_window) that makes it easy to customize and work with your Flutter desktop app window **on Windows, macOS and Linux**. 
 
-Watch the tutorial to get started. Click the image below to watch the video:
+Watch the tutorial to get started. Click the image below to watch the video: 
 
 [![IMAGE ALT TEXT](https://img.youtube.com/vi/bee2AHQpGK4/0.jpg)](https://www.youtube.com/watch?v=bee2AHQpGK4 "Click to open")
 
@@ -18,85 +10,70 @@ Watch the tutorial to get started. Click the image below to watch the video:
 
 **Features**:
 
-- Custom window frame - remove standard Windows/macOS/Linux titlebar and buttons
-- Hide window on startup
-- Show/hide window
-- Move window using Flutter widget
-- Minimize/Maximize/Restore/Close window
-- Set window size, minimum size and maximum size
-- Set window position
-- Set window alignment on screen (center/topLeft/topRight/bottomLeft/bottomRight)
-- Set window title
+    - Custom window frame - remove standard Windows/macOS/Linux titlebar and buttons
+    - Hide window on startup
+    - Show/hide window
+    - Move window using Flutter widget
+    - Minimize/Maximize/Restore/Close window
+    - Set window size, minimum size and maximum size
+    - Set window position
+    - Set window alignment on screen (center/topLeft/topRight/bottomLeft/bottomRight)
+    - Set window title
 
 # Getting Started
 
-Add the package to your project's `pubspec.yaml` file manually or using the command below:
-
-```shell
-pub add bitsdojo_window
-```
-
-The `pubspec.yaml` file should look like this:
-
-```diff
-// pubspec.yaml
-
-  ...
-
-  dependencies:
-    flutter:
-      sdk: flutter
-+ bitsdojo_window: ^0.1.6
-
-  dev_dependencies:
-
-  ...
-```
+Install the package using `pubspec.yaml`
 
 # For Windows apps
 
-Inside your application folder, go to `windows\runner\main.cpp` and change the code look like this:
+Inside your application folder, go to `windows\runner\main.cpp` and add these two lines at the beginning of the file:
 
-```diff
-// windows/runner/main.cpp
-
-  ...
-
-  #include "flutter_window.h"
-  #include "utils.h"
-
-+ #include <bitsdojo_window_windows/bitsdojo_window_plugin.h>
-+ auto bdw = bitsdojo_window_configure(BDW_CUSTOM_FRAME | BDW_HIDE_ON_STARTUP);
-
-  int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
-
-  ...
+```cpp
+#include <bitsdojo_window_windows/bitsdojo_window_plugin.h>
+auto bdw = bitsdojo_window_configure(BDW_CUSTOM_FRAME | BDW_HIDE_ON_STARTUP);
 ```
 
 # For macOS apps
 
-Inside your application folder, go to `macos\runner\MainFlutterWindow.swift` and change the code look like this:
+Inside your application folder, go to `macos\runner\MainFlutterWindow.swift` and add this line after the one saying `import FlutterMacOS` :
 
-```diff
-// macos/runner/MainFlutterWindow.swift
-
-  import Cocoa
-  import FlutterMacOS
-+ import bitsdojo_window_macos
-
-- class MainFlutterWindow: NSWindow {
-+ class MainFlutterWindow: BitsdojoWindow {
-+     override func bitsdojo_window_configure() -> UInt {
-+     return BDW_CUSTOM_FRAME | BDW_HIDE_ON_STARTUP
-+   }
-      override func awakeFromNib() {
-
-      ...
-
-    }
-  }
+```swift
+import FlutterMacOS
+import bitsdojo_window_macos // Add this line
 ```
 
+Then change this line from:
+
+```swift
+class MainFlutterWindow: NSWindow {
+```
+
+to this:
+
+```swift
+class MainFlutterWindow: BitsdojoWindow {
+```
+
+After changing `NSWindow` to `BitsdojoWindow` add these lines below the line you changed:
+
+```swift
+override func bitsdojo_window_configure() -> UInt {
+  return BDW_CUSTOM_FRAME | BDW_HIDE_ON_STARTUP
+}
+```
+
+Your code should now look like this:
+
+```swift
+class MainFlutterWindow: BitsdojoWindow {
+    
+  override func bitsdojo_window_configure() -> UInt {
+    return BDW_CUSTOM_FRAME | BDW_HIDE_ON_STARTUP
+  }
+    
+  override func awakeFromNib() {
+    ... //rest of your code
+```
 #
 
 If you don't want to use a custom frame and prefer the standard window titlebar and buttons, you can remove the `BDW_CUSTOM_FRAME` flag from the code above.
@@ -105,63 +82,57 @@ If you don't want to hide the window on startup, you can remove the `BDW_HIDE_ON
 
 # For Linux apps
 
-Inside your application folder, go to `linux\my_application.cc` and change the code look like this:
+Inside your application folder, go to `linux\my_application.cc` and add this line at the beginning of the file:
 
-```diff
-// linux/my_application.cc
+```cpp
+#include <bitsdojo_window_linux/bitsdojo_window_plugin.h>
+```
+Then look for these two lines:
 
-  ...
-  #include "flutter/generated_plugin_registrant.h"
-+ #include <bitsdojo_window_linux/bitsdojo_window_plugin.h>
+```cpp
+gtk_window_set_default_size(window, 1280, 720);
+gtk_widget_show(GTK_WIDGET(window));
+```
+and change them to this:
 
-  struct _MyApplication {
+```cpp
+auto bdw = bitsdojo_window_from(window);            // <--- add this line
+bdw->setCustomFrame(true);                          // <-- add this line
+//gtk_window_set_default_size(window, 1280, 720);   // <-- comment this line
+gtk_widget_show(GTK_WIDGET(window));
+```
 
-  ...
+As you can see, we commented the line calling `gtk_window_set_default_size` and added these two lines before `gtk_widget_show(GTK_WIDGET(window));`
 
-  }
-
-+  auto bdw = bitsdojo_window_from(window);
-+  bdw->setCustomFrame(true);
--  gtk_window_set_default_size(window, 1280, 720);
-   gtk_widget_show(GTK_WIDGET(window));
-
-   g_autoptr(FlDartProject) project = fl_dart_project_new();
-
-  ...
-
-  }
-
+```cpp
+auto bdw = bitsdojo_window_from(window);
+bdw->setCustomFrame(true);
 ```
 
 # Flutter app integration
 
-Now go to `lib\main.dart` and change the code look like this:
+Now go to `lib\main.dart` and add this code in the `main` function right after `runApp(MyApp());` :
 
-```diff
-// lib/main.dart
+```dart
+void main() {
+  runApp(MyApp());
 
-  import 'package:flutter/material.dart';
-+ import 'package:bitsdojo_window/bitsdojo_window.dart';
+  // Add this code below
 
- void main() {
-   runApp(MyApp());
-
-+   doWhenWindowReady(() {
-+     const initialSize = Size(600, 450);
-+     appWindow.minSize = initialSize;
-+     appWindow.size = initialSize;
-+     appWindow.alignment = Alignment.center;
-+     appWindow.show();
-+   });
- }
+  doWhenWindowReady(() {
+    const initialSize = Size(600, 450);
+    appWindow.minSize = initialSize;
+    appWindow.size = initialSize;
+    appWindow.alignment = Alignment.center;
+    appWindow.show();
+  });
+}
 ```
-
 This will set an initial size and a minimum size for your application window, center it on the screen and show it on the screen.
 
-You can find examples in the [example](./bitsdojo_window/example) folder.
+You can find examples in the `example` folder.
 
 Here is an example that displays this window:
-
 <details>
 <summary>Click to expand</summary>
 
@@ -278,19 +249,14 @@ class WindowButtons extends StatelessWidget {
   }
 }
 ```
-
 </details>
 
 #
+# ❤️ **Sponsors - friends helping this package**
 
-# **Want to help? Become a sponsor**
-
-I am developing this package in my spare time and any help is appreciated.
-
+I am developing this package in my spare time and any help is appreciated. 
 If you want to help you can [become a sponsor](https://github.com/sponsors/bitsdojo).
 
 🙏 Thank you!
 
-## ☕️ Current sponsors:
-
-No sponsors
+Want to help? [Become a sponsor](https://github.com/sponsors/bitsdojo)
