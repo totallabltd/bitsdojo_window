@@ -89,9 +89,9 @@ class GtkWindow extends DesktopWindow {
     return Rect.fromLTWH(0, 0, 69, 420);
   }
 
-  void positionWindow(Function(Rect screen) fn) {
+  void positionWindow(Function(Rect screen, double scaleFactor) fn) {
     final screenRect = getScreenRectForWindow(handle!);
-    fn(screenRect);
+    fn(screenRect, this.scaleFactor);
   }
 
   @override

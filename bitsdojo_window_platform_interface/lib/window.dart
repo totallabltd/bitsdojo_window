@@ -22,7 +22,7 @@ abstract class DesktopWindow {
 
   set title(String newTitle);
 
-  void positionWindow(Function(Rect screen) fn);
+  void positionWindow(Function(Rect screen, double scaleFactor) fn);
 
   @Deprecated("use isVisible instead")
   bool get visible;

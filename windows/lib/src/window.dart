@@ -210,8 +210,8 @@ class WinWindow extends WinDesktopWindow {
     }
   }
 
-  void positionWindow(Function(Rect screen) fn) {
-    fn(getScreenRectForWindow(handle!));
+  void positionWindow(Function(Rect screen, double scaleFactor) fn) {
+    fn(getScreenRectForWindow(handle!), this.scaleFactor);
   }
 
   bool get isMaximized {

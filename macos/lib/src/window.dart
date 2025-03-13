@@ -25,13 +25,13 @@ class MacOSWindow extends DesktopWindow {
     _setTitleOnNextShow = false;
   }
 
-  void positionWindow(Function(Rect screen) fn) {
+  void positionWindow(Function(Rect screen, double scaleFactor) fn) {
     final screenInfo = getScreenInfoForWindow(handle!);
     if (screenInfo.workingRect == null) {
       print("Can't set alignment - don't have a workingRect");
       return;
     }
-    fn(screenInfo.workingRect!);
+    fn(screenInfo.workingRect!, this.scaleFactor);
   }
 
   Size get size {
